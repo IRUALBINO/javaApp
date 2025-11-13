@@ -14,7 +14,11 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-    <scope>test</scope>
+    </properties>
+
+    <dependencies>
+        <!-- JUnit for testing -->
+                   <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -24,10 +28,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>11</source>
-                   configuration>
+                                   <target>11</target>
+                </configuration>
             </plugin>
 
             <!-- JAR Plugin -->
@@ -36,7 +38,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <archive>
-                       plugins>
+                               </plugin>
+        </plugins>
     </build>
 </project>
