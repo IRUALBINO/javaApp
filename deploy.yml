@@ -1,0 +1,8 @@
+- hosts: app_servers
+  become: yes
+  tasks:
+    - name: Pull Docker image
+      command: docker pull abhishektdockerr/java-app:11
+
+    - name: Run container
+      command: docker run -d -p 8080:8080 abhishektdockerr/java-app:11
