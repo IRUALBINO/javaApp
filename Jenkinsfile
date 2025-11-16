@@ -48,11 +48,11 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh """
+                        sh '''
                             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                             docker push ${DOCKER_IMAGE}:${IMAGE_TAG}
                             docker push ${DOCKER_IMAGE}:latest
-                        """
+                        '''
                     }
                 }
             }
@@ -60,10 +60,10 @@ pipeline {
 
         stage('Deploy to EC2 via Ansible') {
             steps {
-                sh '''
-                cd ~/ansible-deploy
-                ansible-playbook -i hosts.ini deploy-docker.yml
-                '''
+                sh """
+                cd ${WORKSPACE}/ansible-deploy
+                IMAGE_TAG=${IMAGE_TAG} ansible-playbook -i hosts.ini deploy-docker.yml
+                """
             }
         }
     }
@@ -76,4 +76,4 @@ pipeline {
             echo "❌ Build or Deploy failed."
         }
     }
-}  // ✅ This is the final closing brace
+}
