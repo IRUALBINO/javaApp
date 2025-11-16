@@ -2,16 +2,17 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "memorieso/java-app"        // Updated for javaApp repo
-        DOCKER_CREDENTIALS = "dockerhub-creds"     // Jenkins credentials ID
+        DOCKER_IMAGE = "memorieso/java-app"        // Your Docker Hub repo
+        DOCKER_CREDENTIALS = "dockerhub-creds"     // Jenkins credentials ID for Docker Hub
+        GIT_CREDENTIALS = "githubtoken"            // Jenkins credentials ID for GitHub
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                // Checkout javaApp repository
-                git branch: 'main', url: 'https://github.com/<your-username>/javaApp.git'
+                // Correct GitHub repo URL and credentials
+                git branch: 'main', url: 'https://github.com/IRUALBINO/javaApp.git', credentialsId: "${GIT_CREDENTIALS}"
             }
         }
 
@@ -51,10 +52,10 @@ pipeline {
 
     post {
         success {
-            echo "Build SUCCESS: Pushed Docker image ${DOCKER_IMAGE}:${IMAGE_TAG}"
+            echo "✅ Build SUCCESS: Pushed Docker image ${DOCKER_IMAGE}:${IMAGE_TAG}"
         }
         failure {
-            echo "Build FAILED. Check logs."
+            echo "❌ Build FAILED. Check logs."
         }
     }
 }
