@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "memorieso/java-app"
-        DOCKER_CREDENTIALS = "dockerhub-creds"
-        GIT_CREDENTIALS = "githubtoken"
+        DOCKER_IMAGE = "memorieso/java-app"        // Docker Hub repo
+        DOCKER_CREDENTIALS = "dockerhub-creds"     // Jenkins credentials ID
+        GIT_CREDENTIALS = "githubtoken"            // GitHub credentials ID
     }
 
     stages {
@@ -20,11 +20,18 @@ pipeline {
             }
         }
 
+        stage('Verify JAR') {
+            steps {
+                sh 'ls -lh target || echo "❌ JAR not found!"'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
                     env.IMAGE_TAG = "${env.BUILD_NUMBER}"
                     sh """
+                       echo "✅ Building Docker image with tag: ${IMAGE_TAG}"
                        docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
                        docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest
                     """
