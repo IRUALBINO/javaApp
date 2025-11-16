@@ -18,7 +18,6 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-                // Build the Java application using Maven
                 sh 'mvn -B clean package -DskipTests'
             }
         }
@@ -26,7 +25,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    IMAGE_TAG = "${env.BUILD_NUMBER}"
+                    def IMAGE_TAG = "${env.BUILD_NUMBER}"  // Added 'def' to avoid warning
                     sh """
                        docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
                     """
