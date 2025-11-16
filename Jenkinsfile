@@ -35,6 +35,7 @@ pipeline {
                 script {
                     env.IMAGE_TAG = "${env.BUILD_NUMBER}"
                     sh """
+                       echo "✅ Building Docker image with tag: ${IMAGE_TAG}"
                        docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
                        docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest
                     """
