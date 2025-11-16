@@ -2,16 +2,16 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "memorieso/java-app"        // Your Docker Hub repo
-        DOCKER_CREDENTIALS = "dockerhub-creds"     // Jenkins credentials ID for Docker Hub
-        GIT_CREDENTIALS = "githubtoken"            // Jenkins credentials ID for GitHub
+        DOCKER_IMAGE = "memorieso/java-app"        // Docker Hub repo
+        DOCKER_CREDENTIALS = "dockerhub-creds"     // Jenkins credentials ID
+        GIT_CREDENTIALS = "githubtoken"            // GitHub credentials ID
+        IMAGE_TAG = ""                              // Initialize globally
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                // Correct GitHub repo URL and credentials
                 git branch: 'main', url: 'https://github.com/IRUALBINO/javaApp.git', credentialsId: "${GIT_CREDENTIALS}"
             }
         }
@@ -25,7 +25,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def IMAGE_TAG = "${env.BUILD_NUMBER}"  // Added 'def' to avoid warning
+                    env.IMAGE_TAG = "${env.BUILD_NUMBER}"  // Set globally
                     sh """
                        docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
                     """
