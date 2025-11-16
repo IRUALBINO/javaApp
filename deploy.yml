@@ -1,8 +1,12 @@
-- hosts: app_servers
+- hosts: appservers
   become: yes
   tasks:
-    - name: Pull Docker image
-      command: docker pull abhishektdockerr/java-app:11
+    - name: Pull latest Docker image
+      command: docker pull memorieso/java-app:latest
 
-    - name: Run container
-      command: docker run -d -p 8080:8080 abhishektdockerr/java-app:11
+    - name: Stop old container
+      command: docker rm -f javaapp
+      ignore_errors: yes
+
+    - name: Run new container
+      command: docker run -d -p 8080:8080 --name javaapp memorieso/java-app:latest
