@@ -5,7 +5,6 @@ pipeline {
         DOCKER_IMAGE = "memorieso/java-app"        // Docker Hub repo
         DOCKER_CREDENTIALS = "dockerhub-creds"     // Jenkins credentials ID
         GIT_CREDENTIALS = "githubtoken"            // GitHub credentials ID
-        IMAGE_TAG = ""                              // Initialize globally
     }
 
     stages {
