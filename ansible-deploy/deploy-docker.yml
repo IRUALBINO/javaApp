@@ -1,29 +1,15 @@
 - name: Deploy Java App Container
-  hosts: appservers
+  hosts: ec2
   become: yes
-
+  vars:
+    docker_image: "memorieso/java-app"
+    docker_tag: "{{ lookup('env','IMAGE_TAG') | default('latest') }}"
   tasks:
-
-    - name: Install Docker (AL2)
-      command: yum install -y docker
-
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
-
-    - name: Add ec2-user to docker group
-      command: usermod -aG docker ec2-user
-      ignore_errors: yes
-
     - name: Pull Docker image
-      command: docker pull memorieso/java-app:latest
+      command: docker pull {{ docker_image }}:{{ docker_tag }}
 
     - name: Stop old container
-      command: docker rm -f javaapp
-      ignore_errors: yes
+      command: docker rm -f java-app || true
 
     - name: Run new container
-      command: docker run -d -p 8080:8080 --name javaapp memorieso/java-app:latest
-
+      command: docker run -d --name java-app -p 8080:8080 {{ docker_image }}:{{ docker_tag }}
