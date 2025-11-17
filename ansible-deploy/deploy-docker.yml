@@ -12,4 +12,4 @@
       command: docker rm -f java-app || true
 
     - name: Run new container
-      command: docker run -d --name java-app -p 8080:8080 {{ docker_image }}:{{ docker_tag }}
+      command: docker run -d --name java-app -p 9090:9090 {{ docker_image }}:{{ docker_tag }}
