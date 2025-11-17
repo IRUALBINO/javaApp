@@ -1,15 +1,18 @@
 - name: Deploy Java App Container
   hosts: ec2
   become: yes
+
   vars:
     docker_image: "memorieso/java-app"
     docker_tag: "{{ lookup('env','IMAGE_TAG') | default('latest') }}"
+
   tasks:
-    - name: Pull Docker image
+
+    - name: Pull latest Docker image
       command: docker pull {{ docker_image }}:{{ docker_tag }}
 
     - name: Stop old container
-      command: docker rm -f java-app || true
+      command: docker rm -f javaapp || true
 
     - name: Run new container
-      command: docker run -d --name java-app -p 9090:9090 {{ docker_image }}:{{ docker_tag }}
+      command: docker run -d --name javaapp -p 9090:9090 {{ docker_image }}:{{ docker_tag }}
