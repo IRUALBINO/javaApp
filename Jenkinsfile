@@ -1,20 +1,17 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven'
-    }
-
     environment {
         DOCKER_IMAGE = "memorieso/java-app"
         DOCKER_CREDENTIALS = "dockerhub-creds"
-        GIT_CREDENTIALS = "githubtoken"
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/IRUALBINO/javaApp.git', credentialsId: "${GIT_CREDENTIALS}"
+                git branch: 'main',
+                    url: 'https://github.com/IRUALBINO/javaApp.git'
             }
         }
 
@@ -24,35 +21,20 @@ pipeline {
             }
         }
 
-        stage('Verify JAR') {
-            steps {
-                sh 'ls -lh target || echo "❌ JAR not found!"'
-            }
-        }
-
-        stage('Build Docker Image') {
+        stage('Docker Build & Push') {
             steps {
                 script {
-                    env.IMAGE_TAG = "${env.BUILD_NUMBER}"
+                    // Build Docker Image
                     sh """
-                       echo "✅ Building Docker image with tag: ${IMAGE_TAG}"
-                       ls -lh target   # Debug: confirm JAR exists
-                       docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
-                       docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest
+                        docker build -t ${DOCKER_IMAGE}:latest .
                     """
-                }
-            }
-        }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh '''
-                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                            docker push ${DOCKER_IMAGE}:${IMAGE_TAG}
+                    // Login & Push to DockerHub
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                        sh """
+                            echo "$PASS" | docker login -u "$USER" --password-stdin
                             docker push ${DOCKER_IMAGE}:latest
-                        '''
+                        """
                     }
                 }
             }
@@ -61,8 +43,9 @@ pipeline {
         stage('Deploy to EC2 via Ansible') {
             steps {
                 sh """
-                cd ${WORKSPACE}/ansible-deploy
-                IMAGE_TAG=${IMAGE_TAG} ansible-playbook -i hosts.ini deploy-docker.yml
+                    export ANSIBLE_HOST_KEY_CHECKING=False
+                    ansible-playbook -i /var/lib/jenkins/ansible-deploy/hosts.ini \
+                                     /var/lib/jenkins/ansible-deploy/deploy-docker.yml
                 """
             }
         }
@@ -70,10 +53,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Deployment successful!"
+            echo "🎉 Deployment Successful!"
         }
         failure {
-            echo "❌ Build or Deploy failed."
+            echo "❌ Deployment Failed!"
         }
     }
 }
